@@ -2,7 +2,6 @@
 
 (define collection "rtools")
 (define deps '("base"
-               "http"
                "sha"))
 (define build-deps '("scribble-lib" "racket-doc"))
 (define pkg-desc "Racket tools")

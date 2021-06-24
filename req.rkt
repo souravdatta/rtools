@@ -43,7 +43,13 @@
                  #:method [method #"GET"]
                  #:params [params '()]
                  #:data [data #f]
-                 #:headers [headers '()])
+                 #:headers [header-values '()])
+  ;  (displayln (format "url = ~a~nmethod = ~a~nparams = ~a~ndata = ~a~nheaders = ~a~n"
+  ;                     url
+  ;                     method
+  ;                     params
+  ;                     data
+  ;                     header-values))
   (let* ([components (url-components url)]
          [host (first components)]
          [port (second components)]
@@ -58,13 +64,21 @@
                                  #:data (data-or-params
                                          data
                                          (append params qparams))
-                                 #:headers (alist->headers headers)
+                                 #:headers (alist->headers header-values)
                                  #:port port)))
-      (let ([content (port->string iport)])
+      (let* ([content (port->string iport)]
+             [status (bytes->status res)]
+             [headers-alist (headers->alist headers)])
         (close-input-port iport)
-        (list (bytes->status res)
-              (headers->alist headers)
-              content)))))
+        (if (= status 301)
+            (let* ([moved-path (cdr (assoc "Location" headers-alist))]
+                   [new-url (format "~a://~a:~a~a" scheme host port moved-path)])
+              (request new-url
+                       #:method method
+                       #:params params
+                       #:data data
+                       #:headers header-values))
+            (list status headers-alist content))))))
 
 (define (ok? res)
   (= (first res)
@@ -81,4 +95,7 @@
 (define (headers-of res)
   (second res))
 
-(provide request ok? json-of content-of headers-of)
+(define (status-of res)
+  (first res))
+
+(provide request ok? json-of content-of headers-of status-of)
