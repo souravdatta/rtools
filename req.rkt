@@ -10,7 +10,9 @@
   (let [(url (string->url path))]
     (list
      (url-host url)
-     (url-port url)
+     (if (not (url-port url))
+         80
+         (url-port url))
      (string-join
       (map (λ (x) (path/param-path x))
            (url-path url))
@@ -56,10 +58,11 @@
          [path (third components)]
          [qparams (fourth components)]
          [scheme (fifth components)])
+    (println port)
     (let-values (([res headers iport]
                   (http-sendrecv (format "~a" host)
                                  (format "/~a" path)
-                                 #:ssl? (if (string=? scheme "https") #t #f)
+                                 ;#:ssl? (if (string=? scheme "https") #t #f)
                                  #:method method
                                  #:data (data-or-params
                                          data
