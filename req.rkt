@@ -58,7 +58,6 @@
          [path (third components)]
          [qparams (fourth components)]
          [scheme (fifth components)])
-    (println port)
     (let-values (([res headers iport]
                   (http-sendrecv (format "~a" host)
                                  (format "/~a" path)
@@ -75,7 +74,11 @@
         (close-input-port iport)
         (if (= status 301)
             (let* ([moved-path (cdr (assoc "Location" headers-alist))]
-                   [new-url (format "~a://~a:~a~a" scheme host port moved-path)])
+                   [new-url (if (equal?
+                                 (string-ref moved-path 0)
+                                 #\/)
+                                (format "~a://~a:~a~a" scheme host port moved-path)
+                                moved-path)])
               (request new-url
                        #:method method
                        #:params params
