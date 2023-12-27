@@ -52,10 +52,15 @@
   ;                     header-values))
   (let* ([components (url-components url)]
          [host (first components)]
-         [port (second components)]
+         [url-port (second components)]
          [path (third components)]
          [qparams (fourth components)]
-         [scheme (fifth components)])
+         [scheme (fifth components)]
+         [port (if (not url-port)
+                   (if (string=? scheme "https")
+                       443
+                       80)
+                   url-port)])
     (let-values (([res headers iport]
                   (http-sendrecv (format "~a" host)
                                  (format "/~a" path)
