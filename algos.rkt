@@ -31,7 +31,7 @@
          a))))
 
 (define (fixed-point f exp #:test [test equal?] #:max [max 0])
-  (let ([ls (fixed-point-list f exp #:test test) #:max max])
+  (let ([ls (fixed-point-list f exp #:test test #:max max)])
     (if (empty? ls)
         #f
         (first ls))))
