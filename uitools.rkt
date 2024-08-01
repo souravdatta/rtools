@@ -5,18 +5,22 @@
 (define timer-frame%
   (class frame%
     (super-new)
-    (field [timer #f])
+    (field [frm-timer #f])
     (init-field [interval 1000])
     (define/public (set-timer fn)
-      (when (not timer)
-        (set! timer (new timer%
+      (when (not frm-timer)
+        (set! frm-timer (new timer%
                          [notify-callback fn]
                          [interval interval]))))
     (define/public (stop-timer)
-      (send timer stop))
+      (when frm-timer
+        (send frm-timer stop)))
+    (define/public (start-timer)
+      (when frm-timer
+        (send frm-timer start interval)))
     (define (on-close)
-      (when timer
-        (send timer stop)))
+      (when frm-timer
+        (send frm-timer stop)))
     (augment on-close)))
 
 
@@ -25,7 +29,7 @@
                         (* mins 60)
                         secs))
   (define f (new timer-frame%
-                 [label (format "Timer ~a:~a:~a" hrs mins secs)]
+                 [label (format "Timer ~aH ~aM ~aS" hrs mins secs)]
                  [width 100]
                  [height 60]))
   (define vpane (new vertical-pane%
@@ -35,11 +39,16 @@
                    [parent vpane]
                    [min-width 80]
                    [label (format "Starting countdown for ~a s" total-secs)]))
+  (define prgs (new gauge%
+                    [parent vpane]
+                    [label ""]
+                    [range total-secs]))
   (send f set-timer (thunk
                      (if (>= total-secs 0)
                          (begin
                            (send lbl set-label
                                  (format "Remaining seconds: ~a" total-secs))
+                           (send prgs set-value total-secs)
                            (set! total-secs (- total-secs 1)))
                          (send f stop-timer))))
   (send f show #t)
@@ -59,17 +68,24 @@
                    [parent vpane]
                    [min-width 160]
                    [label ""]))
-  (define btn (new button%
-                   [parent vpane]
-                   [label "Start"]
-                   [callback (λ (b e)
-                               (send f set-timer
-                                     (thunk
-                                      (send lbl set-label
-                                            (format "Elapsed seconds: ~a" total-secs))
-                                      (set! total-secs (+ total-secs 1))))
-                               (send b enable #f))]))
-  
+  (define hpane (new horizontal-pane%
+                     [parent vpane]))
+  (define btn-start (new button%
+                         [parent hpane]
+                         [label "Start"]
+                         [callback (λ (b e)
+                                     (send f start-timer))]))
+  (define btn-stop (new button%
+                        [parent hpane]
+                        [label "Stop"]
+                        [callback (λ (b e)
+                                    (send f stop-timer))]))
+  (send f set-timer
+        (thunk
+         (send lbl set-label
+               (format "Elapsed seconds: ~a" total-secs))
+         (set! total-secs (+ total-secs 1))))
+  (send f stop-timer)
   (send f show #t)
   f)
 
