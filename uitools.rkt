@@ -10,8 +10,8 @@
     (define/public (set-timer fn)
       (when (not frm-timer)
         (set! frm-timer (new timer%
-                         [notify-callback fn]
-                         [interval interval]))))
+                             [notify-callback fn]
+                             [interval interval]))))
     (define/public (stop-timer)
       (when frm-timer
         (send frm-timer stop)))
@@ -23,6 +23,15 @@
         (send frm-timer stop)))
     (augment on-close)))
 
+(define (secs->timestring secs)
+  (let* ([s (remainder secs 60)]
+         [mr (floor (/ secs 60))]
+         [m (remainder mr 60)]
+         [h (floor (/ mr 60))])
+    (format "~a:~a:~a"
+            h
+            m
+            s)))
 
 (define (timer #:secs [secs 0] #:mins [mins 0] #:hrs [hrs 0])
   (define total-secs (+ (* hrs 3600)
@@ -38,7 +47,8 @@
   (define lbl (new message%
                    [parent vpane]
                    [min-width 80]
-                   [label (format "Starting countdown for ~a s" total-secs)]))
+                   [label (format "Starting countdown for ~a" (secs->timestring
+                                                               total-secs))]))
   (define prgs (new gauge%
                     [parent vpane]
                     [label ""]
@@ -47,7 +57,8 @@
                      (if (>= total-secs 0)
                          (begin
                            (send lbl set-label
-                                 (format "Remaining seconds: ~a" total-secs))
+                                 (format "Remaining time: ~a" (secs->timestring
+                                                               total-secs)))
                            (send prgs set-value total-secs)
                            (set! total-secs (- total-secs 1)))
                          (send f stop-timer))))
@@ -83,7 +94,8 @@
   (send f set-timer
         (thunk
          (send lbl set-label
-               (format "Elapsed seconds: ~a" total-secs))
+               (format "Elapsed time: ~a" (secs->timestring
+                                           total-secs)))
          (set! total-secs (+ total-secs 1))))
   (send f stop-timer)
   (send f show #t)
