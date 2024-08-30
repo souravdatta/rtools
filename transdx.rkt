@@ -95,43 +95,4 @@
                  eof-object?
                  r))))
 
-
-;; Examples
-
-;; (define t1 (mapping (λ (x) (* x 3))))
-;; (define t2 (filtering (λ (x) (= (remainder x 2) 0))))
-;; (define t3 (filtering (λ (x) (< x 100))))
-;; (define t4 (mapping identity))
-;; 
-;; (define tx (comping (list t1 t2)))
-;; (redux (just t2) 4 '() list-conj)
-;; (redux (comping (list t1 t1 t2)) 4 '() list-conj)
-;; (redux (comping (list t3 t1 t2)) 4 '() list-conj)
-;; 
-;; (define algo (comping (list (filtering (λ (x) (< x 100)))
-;;                             (mapping (λ (x) (* x 3)))
-;;                             (filtering odd?))))
-;; 
-;; 
-;; (define (transduce-rand n r)
-;;   (let ([accm '()])
-;;     (for ([i (range n)])
-;;       (set! accm (second
-;;                   (redux r (random 200) accm list-conj))))
-;;     accm))
-;; 
-;; (define (prep-file f)
-;;   (call-with-output-file f
-;;     (λ (out)
-;;       (for ([i (range 20)])
-;;         (writeln (random 110) out)))
-;;     #:exists 'replace))
-;; 
-;; (transduce-list (range 200) algo)
-;; (transduce-vector (list->vector
-;;                    (range 200)) algo)
-;; (transduce-rand 50 algo)
-;; ;; (prep-file "test.txt")
-;; (transduce-file "test.txt" algo)
-
 (provide (all-defined-out))
