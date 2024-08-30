@@ -86,11 +86,11 @@
              #:into #[]
              #:conj vec-conj))
 
-(define (transduce-file f r)
+(define (transduce-file f conv r)
   (call-with-input-file f
     (λ (in)
       (transduce (read-line in)
-                 string->number
+                 conv
                  (λ (_) (read-line in))
                  eof-object?
                  r))))
