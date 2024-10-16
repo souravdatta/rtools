@@ -36,6 +36,38 @@
         #f
         (first ls))))
 
+(define (repeat f n)
+  (do ([i 0 (+ i 1)]
+       [accm '() (cons (f) accm)])
+    ((= i n) accm)))
+
+(define (insert x ys n)
+  (define (insert-aux i ys accm)
+    (if (= i n)
+        (append (reverse accm) (list x) ys)
+        (insert-aux (+ i 1) (cdr ys) (cons (car ys)
+                                           accm))))
+  (cond
+    ((> n (length ys)) ys)
+    ((= n (length ys)) (append ys (list x)))
+    (else (insert-aux 0 ys '()))))
+
+(define (partial n)
+  (λ (f nth-arg)
+    (λ args
+      (apply f (insert nth-arg args n)))))
+
+(define partial-0 (partial 0))
+(define partial-1 (partial 1))
+(define partial-2 (partial 2))
+(define partial-3 (partial 3))
+(define partial-4 (partial 4))
+(define partial-5 (partial 5))
+(define partial-6 (partial 6))
+(define partial-7 (partial 7))
+(define partial-8 (partial 8))
+(define partial-9 (partial 9))
+(define partial-10 (partial 10))
 
 
 (provide (all-defined-out))
