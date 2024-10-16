@@ -69,5 +69,15 @@
 (define partial-9 (partial 9))
 (define partial-10 (partial 10))
 
+(define (fork-compose f g h)
+  (λ args
+    (g (apply f args)
+       (apply h args))))
+
+(define (id x)
+  x)
+
+(define (rook-compose g h)
+  (rook-compose id g h))
 
 (provide (all-defined-out))
