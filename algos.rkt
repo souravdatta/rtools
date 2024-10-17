@@ -57,6 +57,17 @@
     (λ args
       (apply f (insert nth-arg args n)))))
 
+(define (n-partial . ns)
+  (λ (f . nargs)
+    (if (not (= (length ns)
+                (length nargs)))
+        (error "Cannot create partial function with varying pos and arg lengths")
+        (λ args
+          (let ((i-args (for/fold ([accm args])
+                                  ([p (map cons ns nargs)])
+                          (insert (cdr p) accm (car p)))))
+            (apply f i-args))))))
+
 (define partial-0 (partial 0))
 (define partial-1 (partial 1))
 (define partial-2 (partial 2))
