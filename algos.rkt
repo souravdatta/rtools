@@ -14,7 +14,7 @@
 
 (define (nest-list-tx f init n txf)
   (do ([i 0 (+ i 1)]
-       [cur init (f (txf cur))]
+       [cur init ((compose txf f) cur))]
        [a '() (cons cur a)])
     ((= i n) (reverse a))))
 
