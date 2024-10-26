@@ -5,12 +5,18 @@
   (do ([i 0 (+ i 1)]
        [x exp (f x)]
        [a '() (cons x a)])
-    ((>= i n) a)))
+    ((>= i n) (reverse a))))
 
 (define (nest-while f exp cnd)
   (do ([x exp (f x)]
        [a '() (cons x a)])
-    ((not (cnd x)) a)))
+    ((not (cnd x)) (reverse a))))
+
+(define (nest-list-tx f init n txf)
+  (do ([i 0 (+ i 1)]
+       [cur init (f (txf cur))]
+       [a '() (cons cur a)])
+    ((= i n) (reverse a))))
 
 (define (nest f exp n)
   (do ([i 0 (+ i 1)]
