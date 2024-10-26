@@ -95,6 +95,6 @@
   x)
 
 (define (rook-compose g h)
-  (rook-compose id g h))
+  (fork-compose id g h))
 
 (provide (all-defined-out))
